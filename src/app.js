@@ -37,6 +37,10 @@ app.post("/", async (req, res) => {
         confirmPassword: req.body.ConfirmPassword,
       });
       const token = await registerEmploy.generateAuthToken();
+      res.cookie("jwt", token, {
+        expires: new Date(Date.now() + 30000),
+        httpOnly: true,
+      });
       const registred = await registerEmploy.save();
       res.status(201).render("login");
     } else {
@@ -54,7 +58,11 @@ app.post("/login", async (req, res) => {
     const userEmail = await Register.findOne({ email: email });
     const isMatch = await bcrypt.compare(password, userEmail.password);
     const token = await userEmail.generateAuthToken();
-    console.log(token);
+    res.cookie("jwt", token, {
+      expires: new Date(Date.now() + 30000),
+      httpOnly: true,
+      // secure:true
+    });
     if (isMatch) {
       res.status(201).render("index");
     } else {
