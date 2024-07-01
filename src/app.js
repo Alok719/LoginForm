@@ -7,6 +7,7 @@ require("./db/conn");
 const Register = require("./models/registers");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 const view_path = path.join(__dirname, "../views");
 app.set("view engine", "hbs");
@@ -15,6 +16,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 const port = process.env.PORT || 5000;
 
@@ -23,6 +25,10 @@ app.get("/", (req, res) => {
 });
 app.get("/login", (req, res) => {
   res.render("login");
+});
+app.get("/secret", (req, res) => {
+  console.log(`this is the cookie ${req.cookies.jwt}`);
+  res.render("secret");
 });
 
 app.post("/", async (req, res) => {
@@ -38,7 +44,7 @@ app.post("/", async (req, res) => {
       });
       const token = await registerEmploy.generateAuthToken();
       res.cookie("jwt", token, {
-        expires: new Date(Date.now() + 30000),
+        expires: new Date(Date.now() + 60000),
         httpOnly: true,
       });
       const registred = await registerEmploy.save();
@@ -59,7 +65,7 @@ app.post("/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, userEmail.password);
     const token = await userEmail.generateAuthToken();
     res.cookie("jwt", token, {
-      expires: new Date(Date.now() + 30000),
+      expires: new Date(Date.now() + 60000),
       httpOnly: true,
       // secure:true
     });
