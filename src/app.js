@@ -30,6 +30,18 @@ app.get("/login", (req, res) => {
 app.get("/secret", auth, (req, res) => {
   res.render("secret");
 });
+app.get("/logout", auth, async (req, res) => {
+  try {
+    req.user.tokens = req.user.tokens.filter((currToken) => {
+      return currToken.token != req.token;
+    });
+    res.clearCookie("jwt");
+    await req.user.save();
+    res.render("login");
+  } catch (error) {
+    res.status(401).send(error);
+  }
+});
 
 app.post("/", async (req, res) => {
   try {
