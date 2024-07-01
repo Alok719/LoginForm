@@ -8,6 +8,7 @@ const Register = require("./models/registers");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+const auth = require("./middleware/auth");
 
 const view_path = path.join(__dirname, "../views");
 app.set("view engine", "hbs");
@@ -26,8 +27,7 @@ app.get("/", (req, res) => {
 app.get("/login", (req, res) => {
   res.render("login");
 });
-app.get("/secret", (req, res) => {
-  console.log(`this is the cookie ${req.cookies.jwt}`);
+app.get("/secret", auth, (req, res) => {
   res.render("secret");
 });
 
